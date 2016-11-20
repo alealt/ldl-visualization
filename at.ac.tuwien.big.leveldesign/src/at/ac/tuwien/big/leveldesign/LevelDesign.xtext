@@ -1,0 +1,65 @@
+grammar at.ac.tuwien.big.leveldesign.LevelDesign with org.eclipse.xtext.common.Terminals
+
+generate levelDesign "http://www.ac.at/tuwien/big/leveldesign/LevelDesign"
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+
+Level:
+	'spawn' '=>' spawnRoom=[Room] 
+	'goal' '=>' goalRoom=[Room]
+	
+	rooms+=Room+
+;
+
+Room:
+	'room' name=ID '{'
+		'columns' '='? columns=INT
+		'rows' '='? rows=INT
+		
+		entry = Entry
+		exit = Exit exitConnection = Connection?
+		
+		walls += Wall*
+		trapdoors += Trapdoor*
+		monsters += Monster*
+		
+	'}'
+;
+
+Connection: 
+	type=STRING '=>' nextRoom = [Room]
+;
+
+Monster:
+	'monster' name=ID? '@'? position=Coordinate '{'
+		'hp' '='? hp=INT
+		'damage' '='? damage=INT
+		'speed' '='? speed=DOUBLE
+		'range' '='? range=INT
+		'aggroradius' '='? aggroRadius=INT
+	'}'
+;
+
+Trapdoor:
+	'trapdoor' name=ID? '@'? position=Coordinate  
+;
+
+Wall:
+	'wall' name=ID 'from' from=Coordinate 'to' to=Coordinate
+;
+
+Entry: 
+	'entry' name=ID '@'? position=Coordinate 
+;
+
+Exit:
+	'exit' name=ID '@'? position=Coordinate 
+;
+
+Coordinate:
+	'('column=INT ',' row=INT')' | column=INT ',' row=INT
+;
+
+terminal DOUBLE returns ecore::EDouble:
+	INT '.' INT
+;
